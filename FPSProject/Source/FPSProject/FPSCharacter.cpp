@@ -15,7 +15,7 @@ AFPSCharacter::AFPSCharacter()
 	FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	check(FPSCameraComponent != nullptr);
 
-	// 将摄像机组件附加到胶囊体组件
+	// 将摄像机组件附加到胶囊体组件。强转到USceneComponent类型
 	FPSCameraComponent->SetupAttachment(CastChecked<USceneComponent, UCapsuleComponent>(GetCapsuleComponent()));
 
 	// 将摄像机置于略高于眼睛上方的位置
@@ -79,6 +79,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("MoveRight", this, &AFPSCharacter::MoveRight);
 
 	// 对于转视角功能，直接绑定到引擎提供的两个函数
+	// Row Pitch Yaw 分别是绕 X Y Z 轴旋转
 	PlayerInputComponent->BindAxis("Turn", this, &AFPSCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPSCharacter::AddControllerPitchInput);
 
@@ -125,22 +126,22 @@ void AFPSCharacter::StopJump()
 // 实现射击功能
 void AFPSCharacter::Fire()
 {
-	// 试图发射发射物。
+	// 试图发射发射物
 	if (ProjectileClass)
 	{
-		// 获取摄像机变换。
+		// 获取摄像机变换
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-		// 设置MuzzleOffset，在略靠近摄像机前生成发射物。
+		// 设置MuzzleOffset（枪口相对摄像机的位置），在略靠近摄像机前生成发射物
 		MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
 
-		// 将MuzzleOffset从摄像机空间变换到世界空间。
+		// 将MuzzleOffset从摄像机空间变换到世界空间
 		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
-
-		// 使目标方向略向上倾斜。
 		FRotator MuzzleRotation = CameraRotation;
+		
+		// 将准星略向上抬
 		MuzzleRotation.Pitch += 10.0f;
 
 		UWorld* World = GetWorld();
@@ -150,11 +151,11 @@ void AFPSCharacter::Fire()
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = GetInstigator();
 
-			// 在枪口位置生成发射物。
+			// 在枪口位置生成发射物实例
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
 			if (Projectile)
 			{
-				// 设置发射物的初始轨迹。
+				// 调用FPSProjectile::FireIndirection设置发射物的初始方向
 				FVector LaunchDirection = MuzzleRotation.Vector();
 				Projectile->FireInDirection(LaunchDirection);
 			}

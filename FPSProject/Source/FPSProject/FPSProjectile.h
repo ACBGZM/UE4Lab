@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "FPSProjectile.generated.h"
 
 UCLASS()
@@ -45,5 +46,8 @@ public:
 		UMaterialInstanceDynamic* ProjectileMaterialInstance;
 
 
+	// ÏìÓ¦Åö×²º¯Êý
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 };
