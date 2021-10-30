@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
 #include "FloatingActor.generated.h"
 
 UCLASS()
@@ -23,7 +24,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere)
+	// 想要销毁组件，要在代码中手动定义Mesh；也方便手动修改Mesh
+	UPROPERTY(VisibleAnywhere, Category = "Static")
 		UStaticMeshComponent* VisualMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloatingActor")
@@ -31,5 +33,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloatingActor")
 		float RotationSpeed = 20.0f;
+
+
+
+public:
+	UFUNCTION()
+		void CheckActor(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };
